@@ -1,6 +1,6 @@
 import {Button, Grid, TextField} from "@material-ui/core";
 import {useRef, useState} from "react";
-import {useMoralisFile} from "react-moralis";
+import {useMoralisFile, useNewMoralisObject} from "react-moralis";
 import {makeStyles} from "@material-ui/core/styles";
 
 const useStyles = makeStyles((theme) => ({
@@ -22,8 +22,7 @@ const useStyles = makeStyles((theme) => ({
 
     },
 }));
-const metadata = { createdById: "user-id" };
-const tags = { groupId: "GameScore" };
+
 const AssetComponent = () => {
     const classes = useStyles();
     const uploadInputRef = useRef(null);
@@ -36,8 +35,8 @@ const AssetComponent = () => {
         moralisFile,
         saveFile,
     } = useMoralisFile();
+    const { isSaving, error: e1, save } = useNewMoralisObject("Items");
 
-    console.log('moralisFile >>> ',moralisFile)
 
     const onFileChange = (e) => {
         setSelectedFile({
@@ -53,6 +52,9 @@ const AssetComponent = () => {
             if(selectedFile && selectedFile.raw && "image/jpeg"===selectedFile.raw.type){
                 const fileIpfs = await saveFile(fileName+".jpg", selectedFile.raw,{ saveIPFS: true });
                 console.log('moralisFile',fileIpfs)
+                if(fileIpfs){
+                    save({ moralisFile: fileIpfs });
+                }
             }
         }
     }
